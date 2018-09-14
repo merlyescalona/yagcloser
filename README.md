@@ -10,15 +10,15 @@ A set of tools that allows correct assemblies using proximity ligation data.
  - Scaffold Fixing (breaking)
  - Inversion detection and fixing
 
-# Post-processing pipeline
+## Post-processing pipeline
 
-## Software requirements
+### Software requirements
 - [bwa](https://github.com/lh3/bwa)
 - [samtools](https://github.com/samtools/samtools)
 - [picard tools](https://github.com/broadinstitute/picard)
 
 
-## Pipeline
+### Pipeline
 
 1. Index previously assembled reference, using [bwa](https://github.com/lh3/bwa)
 ```
@@ -52,11 +52,9 @@ java -jar /path/to/picard/picard.jar MarkDuplicates \
 describe-assembly -g assembled_reference.fasta -B > assembled_reference.gaps.bed
 ```
 
-# PLAEC tools
+## PLAEC tools: Interaction matrices and scaffold breaking
 
-## Interaction matrices and scaffold breaking
-
-### Input 
+**Input **
 
 - [Required] Assembled reference ([FASTA](https://en.wikipedia.org/wiki/FASTA_format) file)
 - [Required] Gap info on the assembled reference ([BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) file)
