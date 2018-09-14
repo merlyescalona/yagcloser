@@ -29,7 +29,10 @@ bwa index -a bwtsw assembled_reference.fasta
 2. Map HiC data library to the previously assembled reference, using [bwa](https://github.com/lh3/bwa), compress and sort the results using [samtools](https://github.com/samtools/samtools)
 
 ```
-bwa mem -M assembled_reference.fasta HiCLibrary.R1.fq HiCLibrary.R2.fq | samtools view -hB - | samtools sort - > HiCLibrary.s.bam
+bwa mem -M assembled_reference.fasta \ 
+    HiCLibrary.R1.fq HiCLibrary.R2.fq | \
+    samtools view -hB - | \
+    samtools sort - > HiCLibrary.s.bam
 ```
 
 3. Index resulting BAM, using [samtools](https://github.com/samtools/samtools)
