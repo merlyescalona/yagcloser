@@ -1,6 +1,7 @@
 # PLAEC
+
 **P**roximity **L**igation post-processing for **A**ssembly **E**rror-**C**orrection
----
+
 
 ## Introduction
 
@@ -13,6 +14,7 @@ A set of tools that allows correct assemblies using proximity ligation data.
 ## Post-processing pipeline
 
 ### Software requirements
+
 - [bwa](https://github.com/lh3/bwa)
 - [samtools](https://github.com/samtools/samtools)
 - [picard tools](https://github.com/broadinstitute/picard)
@@ -54,7 +56,7 @@ describe-assembly -g assembled_reference.fasta -B > assembled_reference.gaps.bed
 
 ## PLAEC tools: Interaction matrices and scaffold breaking
 
-**Input **
+### Input
 
 - [Required] Assembled reference ([FASTA](https://en.wikipedia.org/wiki/FASTA_format) file)
 - [Required] Gap info on the assembled reference ([BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) file)
