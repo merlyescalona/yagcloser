@@ -27,6 +27,11 @@ minimap2 --secondary=yes -ax [map-pb | map-ont] reference.fasta reads.fastq | sa
 samtools index aln.s.bam
 ```
 
+5. Get a description of the gaps present in the reference file
+
+```
+describe-assembly -g reference.fasta -B > reference.gaps.bed
+```
 
 # Usage
 
