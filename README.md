@@ -65,7 +65,11 @@ usage: yagcloser [-h] -g FASTA FILE PATH -b BED FILE PATH -a BAM FILE PATH -o
 - `-v, --version`: Show program's version number and exit
 - `-h, --help`: show this help message and exit
 
+# Examples
 
+```
+ yagcloser -g assemblies/reference.fasta -a aln/reference.ont.sorted.bam -b gaps/reference.gaps.bed -o gapclosing_ont1 -f 40 - mins 2 -s reference.ont
+ ```
 
 ## TODO: 
 yagloser
