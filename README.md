@@ -65,6 +65,11 @@ usage: yagcloser [-h] -g FASTA FILE PATH -b BED FILE PATH -a BAM FILE PATH -o
 - `-v, --version`: Show program's version number and exit
 - `-h, --help`: show this help message and exit
 
+
+## Output
+
+
+
 # Examples
 
 ```
