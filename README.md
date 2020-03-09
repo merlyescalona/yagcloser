@@ -8,7 +8,7 @@ A program for correction of genome assemblies focused on gap closing and filling
 
 We recommend the input alignment to be generated following these instructions. 
 
-1. Map the long reads against the genome assembly using minimap2 (Li, 2018) and tag secondary alignments (option --secondary=yes). 
+1. Map the long reads against the genome assembly using minimap2 (Li, 2018) and tag secondary alignments (option `--secondary=yes`). 
 2. Convert the alignment into its binary form (BAM file), sort it by coordinates and index it with samtools(Li et al., 2009) [Version tested: 1.7 (using htslib  1.8)]. 
 
 ```
