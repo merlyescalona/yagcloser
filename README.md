@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/build-Under%20dev.-yellow"/>
+
 # YAGCloser
 
 **Y**et **A**nother **G**ap **Closer** based on spanning long reads
@@ -105,20 +107,23 @@ usage: yagcloser [-h] -g FASTA FILE PATH -b BED FILE PATH -a BAM FILE PATH -o
 # Examples
 
 ```
- yagcloser -g assemblies/reference.fasta -a aln/reference.ont.sorted.bam -b gaps/reference.gaps.bed -o gapclosing_ont1 -f 40 - mins 2 -s reference.ont
+ yagcloser -g assemblies/reference.fasta \
+    -a aln/reference.ont.sorted.bam \
+    -b gaps/reference.gaps.bed 
+    -o gapclosing_ont1 
+    -f 40 - mins 2 -s reference.ont
  ```
 
-## TODO: 
-yagloser
+## Under dev.
+Pending: 
 
-test data
-simulation 
-assembly
-make arbitrary gaps of arbitrary lengths
-different coverages
-how well they are closed
-how the consensus sequences are
 
-simulated
-bioinformatics application notes
+- test data
+- simulation 
+- assembly
+  - make arbitrary gaps of arbitrary lengths
+- different coverages
+- how well they are closed
+- how the consensus sequences are simulated
+
 
