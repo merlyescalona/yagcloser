@@ -114,16 +114,6 @@ usage: yagcloser [-h] -g FASTA FILE PATH -b BED FILE PATH -a BAM FILE PATH -o
     -f 40 - mins 2 -s reference.ont
  ```
 
-## Under dev.
-Pending: 
 
-
-- test data
-- simulation 
-- assembly
-  - make arbitrary gaps of arbitrary lengths
-- different coverages
-- how well they are closed
-- how the consensus sequences are simulated
 
 
