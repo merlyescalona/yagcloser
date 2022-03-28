@@ -1,14 +1,24 @@
 #! /usr/bin/python
 """
 Generates a list of gaps that are potentially to be filled or closed.
-(c) 2018 Merly Escalona <mmescalo@ucsc.edu>
+(c) 2018-2022 Merly Escalona <mmescalo@ucsc.edu>
 """
 
 import argparse,collections,copy,csv,datetime,filetype
 import glob,gzip,logging,os,pysam,random,string,sys
 import numpy as np
-from Bio import SeqIO, Seq, AlignIO,Alphabet
-from StringIO import StringIO
+from Bio import SeqIO, Seq, AlignIO
+try:
+    from Bio import Alphabet
+except ImportError:
+    pass
+
+try:
+    from StringIO import StringIO # Python 2
+except ModuleNotFoundError:
+    from io import StringIO # Python 3
+
+
 from Bio.Align.Applications import MuscleCommandline, MafftCommandline
 import Bio.Align.AlignInfo
 
@@ -37,7 +47,6 @@ CIGARVALUES={
     "4":"S","5":"H","6":"P","7":"=",\
     "8":"X","9":"B" \
 }
-
 ###############################################################################
 
 def scaffold_name_generator(scaffold_name_length=10):
@@ -321,7 +330,8 @@ def identify_potential_gaps(bed,scaffolds,parameters):
     removedGaps=[]
     removedCounter=0
     gapCounter=0
-    for gapKey in data.keys():
+    availableGapKeys=list(data.keys())
+    for gapKey in availableGapKeys:
         if gapCounter % 100 == 0:   
             APPLOGGER.debug("Gap {:4}/{}: {:35}".format(gapCounter,totalGaps,gapKey)) 
         if len(data[gapKey]['mapq']) ==  0: 
@@ -431,7 +441,8 @@ def extract_support_data(data, parameters, reference):
                     "lflank":"",\
                     "rflank":""} for rn in readlistfiltered}
             # region="{}:{}-{}".format(scaffold,start,end)
-            APPLOGGER.debug("[{:>10,}/{:>10,}]\t{:50} Spanning/all\t({:>6,}/{:6,})".format(gapCounter, len(data),gapKey,len(readlistfiltered),len(readlist)))
+            APPLOGGER.debug("[{:>10,}/{:>10,}]\t{:50} Spanning/all\t({:>6,}/{:6,})".format(\
+                gapCounter, len(data),gapKey,len(readlistfiltered),len(readlist)))
             for read in samfile.fetch(contig=scaffold,start=start,end=end): # Iterator
                 if  (not read.is_secondary) and \
                     (not read.is_supplementary) and \
@@ -510,7 +521,8 @@ def extract_support_data(data, parameters, reference):
         ambiguosdecisions=[]
         APPLOGGER.debug("="*80)
         APPLOGGER.debug("[{}]\t| {} - {} |\t{}".format("GapKey","MostFrequentSequenceSize","EmptyFlankRatio","Support"))
-        for gapKey in allreads.keys():
+        iterationKeys=list(allreads.keys())
+        for gapKey in iterationKeys:
             flanksizes=[]
             seqsizes=[]
             for readKey in allreads[gapKey]:
@@ -534,7 +546,7 @@ def extract_support_data(data, parameters, reference):
                     len(flanksizes)/2))
                     # { d:summarySizes[d] for d in sorted(summarySizes.keys())}))
         APPLOGGER.debug("-"*80)      
-        with open("{}/{}.ambiguous.txt".format(OUTPUT,SAMPLENAME), "wb" ) as handle:
+        with open("{}/{}.ambiguous.txt".format(OUTPUT,SAMPLENAME), "w" ) as handle:
             handle.write("gapkey\tsupport\n")
             for index in range(0,len(ambiguosdecisions)):
                 APPLOGGER.info("Removing gaps with ambiguous decisions... [{:>40} (Support = {})] ".format(ambiguosdecisions[index][0],ambiguosdecisions[index][1] ))          
@@ -587,13 +599,13 @@ def extract_support_data(data, parameters, reference):
                         id="{}_FULLREAD".format(readKey)\
                     )
                 ]
-            with open(gapFilename0, "wb") as handle:
+            with open(gapFilename0, "w") as handle:
                 _=SeqIO.write(MSA,handle,"fasta")
-            with open(gapFilename1, "wb") as handle:
+            with open(gapFilename1, "w") as handle:
                 _=SeqIO.write(MSA2,handle,"fasta")
-            with open(gapFilename2, "wb") as handle:
+            with open(gapFilename2, "w") as handle:
                 _=SeqIO.write(FLANKS,handle,"fasta")
-            with open(gapFilename3, "wb") as handle:
+            with open(gapFilename3, "w") as handle:
                 _=SeqIO.write(PILE,handle,"fasta")
     except Exception as e:
         return None, "{}\t{}".format(e.__class__,e.message)
@@ -656,7 +668,7 @@ def length_agreement(data,reference, parameters):
             # 3. calculate mean length between those closest points
             newlength=np.mean(np.array(testSet)[minDistPosition])
             # 4. get a threshold
-            threshold=newlength*0.1
+            threshold=newlength*parameters["PERCENT_LINKAGE_DISTANCE"] # default=0.1
             thresholdRange=[newlength-threshold, newlength+threshold]
             # 5. start calculating if there are sequences within the thresholdRange
             selectedPositions=[j for i in np.where(np.logical_and(np.array(testSet) >= thresholdRange[0],np.array(testSet) <= thresholdRange[1])) for j in i]
@@ -665,7 +677,7 @@ def length_agreement(data,reference, parameters):
                 selected=[testSet[sp] for sp in selectedPositions]
                 testSet=[testSet[t] for t in range(0, len(testSet)) if not t in selectedPositions]
                 newlength=np.mean(np.array(selected))
-                threshold=newlength*0.1
+                threshold=newlength*parameters["PERCENT_LINKAGE_DISTANCE"] # default=0.1
                 thresholdRange=[newlength-threshold, newlength+threshold]
                 selectedPositions=[j for i in np.where(np.logical_and(np.array(testSet) >= thresholdRange[0],np.array(testSet) <= thresholdRange[1])) for j in i]
             thresholdRange=[newlength-threshold, newlength+threshold]
@@ -726,14 +738,16 @@ def consensus_generation(data,parameters):
         alignedpos=dict()
         index=0
         APPLOGGER.info("Reporting gaps with no length agreement data...")
+        interatingDataGapKeys=list(data.keys())
         with open(logfile3,'w') as log:
-            for gapKey in data.keys():
+            for gapKey in interatingDataGapKeys:
                 f="{}/{}.msa/{}.fasta".format(OUTPUT,SAMPLENAME, gapKey.replace(":","-"))
                 log.write("{}\n".format(gapKey))
                 if not os.path.exists(f): 
                     del data[gapKey]
         totalGaps=len(data.keys())
-        for gapKey in data.keys():
+        interatingDataGapKeys=list(data.keys())
+        for gapKey in interatingDataGapKeys:
             index+=1
             f="{}/{}.msa/{}.fasta".format(OUTPUT,SAMPLENAME, gapKey.replace(":","-"))
             scaffold=data[gapKey]['scaffold']
@@ -749,7 +763,8 @@ def consensus_generation(data,parameters):
             alignedpos[gapKey]=dict()
             APPLOGGER.info("[{:5,}/{:5,}]\t{}\t[{:>4}|{:>4}|{:>4}]".format(index,totalGaps, f,abase,ncount,gapcount))
             dalign=SeqIO.to_dict(align)
-            for iseq in dalign.keys(): 
+            iteratingKeys=list(dalign.keys())
+            for iseq in iteratingKeys: 
                 for ic in range(0,len(dalign[iseq])):
                     if dalign[iseq][ic]==cnss[ic] and dalign[iseq][ic]!="-":
                         try:
@@ -780,7 +795,7 @@ def consensus_generation(data,parameters):
                 log.write("{:30}\t{:10}\t{:10}\n".format(scaffold, start,end))
             with open(logfile,'a') as log:
                 if len(sequence) > 0:
-                    for iline in dalign.keys():
+                    for iline in iteratingKeys:
                         log.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(
                             gapKey  ,\
                             matches[gapKey][iline],\
@@ -834,8 +849,11 @@ def consensus(summary, threshold=.1, ambiguous="X",require_multiple=2):
         else: 
             ambiguous=np.random.choice([it for it in atom_dict.keys() if it !="-"])
             consensus += ambiguous 
-    consensus_alpha = summary._guess_consensus_alphabet(ambiguous) 
-    return Seq.Seq(consensus, consensus_alpha) 
+    try:
+        consensus_alpha = summary._guess_consensus_alphabet(ambiguous) 
+        return Seq.Seq(consensus, consensus_alpha) 
+    except: 
+        return Seq.Seq(consensus) 
 
 ###############################################################################
 
@@ -911,6 +929,7 @@ def print_args(args):
     APPLOGGER.info("{:>40} = {:<}".format("mapping_guality_threshold", args.mapping_guality_threshold))
     APPLOGGER.info("{:>40} = {:<}".format("min_coverage_consensus", args.min_coverage_consensus))
     APPLOGGER.info("{:>40} = {:<}".format("min_support", args.min_support))
+    APPLOGGER.info("{:>40} = {:<}".format("percent_linkage_distance", args.percent_linkage_distance))
     APPLOGGER.info("{:>40} = {:<}".format("percent_reads_threshold", args.percent_reads_threshold))
     APPLOGGER.info("{:>40} = {:<}".format("empty_flank_threshold", args.empty_flanks_threshold))
     APPLOGGER.info("{:>40} = {:<}".format("log", args.log))
@@ -963,6 +982,12 @@ def main():
         type = int,\
         help =  'Minimum number of reads needed spanning a gap to be considered for closing or filling.',\
         default=5)
+    optionalArgs.add_argument(\
+        '-pld','--percent-linkage-distance',\
+        metavar = 'FLOAT',\
+        type = float,\
+        help =  'Linkage distance (percentage) of the agglomerative clustering used to identify common sequence length for consensus. ',\
+        default=0.1)
     optionalArgs.add_argument(\
         '-f','--flanksize',\
         metavar = 'INT',\
@@ -1044,6 +1069,7 @@ def main():
         parameters['MIN_CONVERAGE_CONSENSUS']=int(args.min_coverage_consensus)
         parameters['RATIO_THRESHOLD']=int(args.percent_reads_threshold)
         parameters['EMPTY_FLANKS_THRESHOLD']=float(args.empty_flanks_threshold)
+        parameters['PERCENT_LINKAGE_DISTANCE']=float(args.percent_linkage_distance)
         return run(parameters)
     except argparse.ArgumentTypeError as d:
         parser.print_help()
