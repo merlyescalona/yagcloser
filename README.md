@@ -107,7 +107,7 @@ usage: yagcloser [-h] -g FASTA_FILE_PATH -b BED_FILE_PATH -a BAM_FILE_PATH
 
 # Examples
 
-1. Run to identify potential gaps/edits that will be done to he reference
+1. Run to identify potential gaps/edits that will be done to your reference
 ```
  python yagcloser -g reference.fasta \
     -a reference.sorted.bam \
