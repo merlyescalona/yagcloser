@@ -43,7 +43,7 @@ minimap2 --secondary=yes -ax [map-pb | map-ont] reference.fasta reads.fastq | sa
 samtools index aln.s.bam
 ```
 
-5. Get a description of the gaps present in the reference file, you can use the `detgaps` too from `asset`[https://github.com/dfguan/asset] to do so. Check on the corresponding repository how to install it.
+5. Get a description of the gaps present in the reference file, you can use the `detgaps` too from [`asset`](https://github.com/dfguan/asset) to do so. Check on the corresponding repository how to install it.
 
 ```
 detgaps reference.fasta > .gaps.bed &
