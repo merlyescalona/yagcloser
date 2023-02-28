@@ -66,13 +66,13 @@ usage: yagcloser [-h] -g FASTA_FILE_PATH -b BED_FILE_PATH -a BAM_FILE_PATH
 - `-s STR, --samplename STR`:  Short sample name that will be used for naming OUTPUT files. (default: None)
 
 ## Optional arguments:
-- `-mins INT, --min-support INT`: Minimum number of reads needed spanning a gap to be considered for closing or filling. (default: 5)
-- `-f INT, --flanksize INT`: Flank size to be used to select the reads that are in the surroundings of the gap and determine whether there are reads that span the gap or not. (default: 20)
-- `-mapq <MAPQ_threshold>, --mapping-guality-threshold <MAPQ_threshold>`: MAPQ value used to filter alignments for posterior processing.Discarding alingments where: alignment_mapq < MAPQ_threshold. (default: 20)
-- `-mcc INT, --min-coverage-consensus INT`: Require that more than INT sequences to be part of an alignment to put in the consensus. (default: 2)
-- `-prt FLOAT, --percent-reads-threshold FLOAT`: Require that more than INT sequences to remain after the length agreement to be considered for consensus. (default: 0.5)
-- `-eft FLOAT, --empty-flanks-threshold FLOAT Percentage of empty flanks required to skip an ambiguous decision on a gap. (default: 0.2)
-- `-l <log_level>, --log <log_level>`:  Verbosity levels. (default: INFO)
+- `-mins INT, --min-support INT`: Minimum number of reads needed spanning a gap to be considered for closing or filling, (default: 5).
+- `-f INT, --flanksize INT`: Flank size to be used to select the reads that are in the surroundings of the gap and determine whether there are reads that span the gap or not, (`default: 20`).
+- `-mapq <MAPQ_threshold>, --mapping-guality-threshold <MAPQ_threshold>`: MAPQ value used to filter alignments for posterior processing. Discarding alingments where: `alignment_mapq < MAPQ_threshold`, (`default: 20`).
+- `-mcc INT, --min-coverage-consensus INT`: Require that more than INT sequences to be part of an alignment to put in the consensus. **Modify if `-mins/--min-support` < default**, (`default: 2`).
+- `-prt FLOAT, --percent-reads-threshold FLOAT`: Require that more than INT sequences to remain after the length agreement to be considered for consensus. (`default: 0.5`)
+- `-eft FLOAT, --empty-flanks-threshold`: FLOAT Percentage of empty flanks required to skip an ambiguous decision on a gap. (`default: 0.2`)
+- `-l <log_level>, --log <log_level>`:  Verbosity levels, (`default: INFO`).
 
 ## Information arguments:
 - `-v, --version`: Show program's version number and exit
