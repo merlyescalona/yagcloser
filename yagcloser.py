@@ -1,7 +1,7 @@
 #! /usr/bin/python
 """
 Generates a list of gaps that are potentially to be filled or closed.
-(c) 2018-2022 Merly Escalona <mmescalo@ucsc.edu>
+(c) 2018-2020 Merly Escalona <mmescalo@ucsc.edu>
 """
 
 import argparse,collections,copy,csv,datetime,filetype
